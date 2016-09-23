@@ -10,6 +10,7 @@ import json
 import os
 import re
 from functools import wraps
+from collections import OrderedDict
 
 try:
     import yaml
@@ -189,6 +190,13 @@ def process_file_data(cls, name, func, file_attr):
             data = yaml.safe_load(f)
         else:
             data = json.load(f)
+
+    # sort the test names into alphabetic order to be predictable
+    # since yaml/json loader does not have "preserve file order" option
+    # and the hashtable ordering is not useful
+    ordered = OrderedDict()
+    for key in sorted(data.keys()):
+        ordered[key] = data[key]
 
     _add_tests_from_data(cls, name, func, data)
 
